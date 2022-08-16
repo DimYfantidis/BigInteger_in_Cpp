@@ -27,9 +27,6 @@ int main()
 {
     timer t(std::cout);
 
-    BigInteger a = 100;
-
-    std::cout << BigInteger::factorial(200) << std::endl;
 
     return 0;
 }

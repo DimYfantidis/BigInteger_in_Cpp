@@ -5,7 +5,11 @@
 #include <cstring>
 #include <vector>
 #include <exception>
+#include <climits>
+#include <algorithm>
 
+
+typedef unsigned long long uint64;
 
 class BigInteger {
 private:
@@ -19,9 +23,10 @@ public:
 
     BigInteger(const char *);
 
-    BigInteger(const BigInteger &);
+    BigInteger(const BigInteger &) = default;
 
-    BigInteger(BigInteger &&) noexcept;
+    BigInteger(BigInteger &&other) noexcept : digits(other.digits) {}
+
 
     //Helper Functions:
     friend void divide_by_2(BigInteger &a);
@@ -33,6 +38,13 @@ public:
     int operator[] (int) const;
 
     const void *address() { return reinterpret_cast<void *>(digits.data()); }
+
+    // Decimal String representation:
+    std::string toString() const;
+
+    // Hexadecimal String Representation:
+    std::string hex() const;
+
 
     /* * * * Operator Overloading * * * */
 
@@ -46,6 +58,9 @@ public:
 
     BigInteger operator ++ (int);
     BigInteger operator -- (int);
+
+    // Cast to uint64_t:
+    explicit operator uint64() const;
 
     //Addition and Subtraction
     friend BigInteger &operator += (BigInteger &, const BigInteger &);
@@ -143,10 +158,6 @@ BigInteger::BigInteger(const char *s)
     }
 }
 
-BigInteger::BigInteger(const BigInteger &other) = default;
-
-BigInteger::BigInteger(BigInteger &&other) noexcept : digits(std::move(other.digits)) {}
-
 bool Null(const BigInteger& a)
 {
     if(a.digits.size() == 1 && a.digits[0] == 0)
@@ -159,12 +170,64 @@ int Length(const BigInteger &a) {
     return static_cast<int>(a.digits.size());
 }
 
+std::string BigInteger::toString() const
+{
+    std::string str;
+
+    for (int i = 0; i < digits.size(); ++i) {
+        str += static_cast<char>(digits[digits.size() - i - 1] + '0');
+    }
+    return str;
+}
+
+std::string BigInteger::hex() const
+{
+    std::string hex_repr;
+
+    BigInteger quotient(*this);
+
+    static const char HEX_DIGITS[] = {
+            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'
+    };
+
+    while (!Null(quotient))
+    {
+        hex_repr += HEX_DIGITS[static_cast<uint64>(quotient % 16)];
+        quotient /= 16;
+    }
+    std::reverse(hex_repr.begin(), hex_repr.end());
+
+    return hex_repr;
+}
+
 int BigInteger::operator [] (const int index) const
 {
     if(digits.size() <= index || index < 0) {
         throw std::invalid_argument("Out of bounds array index.");
     }
     return digits[index];
+}
+
+BigInteger::operator uint64() const
+{
+    static const BigInteger LIMIT = UINT64_MAX;
+
+    if (*this > LIMIT) {
+        throw std::invalid_argument("BigInteger higher than ULL max value.");
+    }
+    char data[30];
+    int i = static_cast<int>(digits.size());
+
+    data[i] = '\0';
+
+    for (i = 0; i < digits.size(); ++i) {
+        data[i] = static_cast<char>(digits[digits.size() - i - 1] + '0');
+    }
+    data[i] = '\0';
+
+    i = strtoull(data, nullptr, 10);
+
+    return i;
 }
 
 bool operator == (const BigInteger &a, const BigInteger &b) {
@@ -451,7 +514,6 @@ BigInteger &operator %= (BigInteger &a, const BigInteger &b)
         throw std::invalid_argument("Arithmetic Error: Division By 0");
     if(a < b)
     {
-        a = BigInteger();
         return a;
     }
     if(a == b)
@@ -486,6 +548,7 @@ BigInteger operator % (const BigInteger &a, const BigInteger &b)
 {
     BigInteger temp(a);
     temp %= b;
+    std::cout << a << " % " << b << " = " << temp << std::endl;
     return temp;
 }
 
