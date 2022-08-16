@@ -21,9 +21,9 @@ public:
     ~timer()
     {
         t1 = std::chrono::high_resolution_clock::now();
-        os  << "\nFunction time: "
+        os  << "\nFunction elapsed time: "
             << static_cast<double>(std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count()) / 1000.0
-            << "ms\n";
+            << "sec\n";
     }
 };
 
@@ -53,5 +53,5 @@ int main()
               << "\nEXPR: " << n << "! % catalan(" << n << ") = " << u2 << '\n'
               << std::endl;
 
-    return 0;
+    return EXIT_SUCCESS;
 }

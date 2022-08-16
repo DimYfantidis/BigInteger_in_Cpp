@@ -7,17 +7,18 @@
 #include <exception>
 #include <climits>
 #include <algorithm>
+#include <cstdint>
 
-
-typedef unsigned long long uint64;
 
 class BigInteger {
 private:
     std::string digits;
 
+    int operator[] (int) const;
+
 public:
     //Constructors:
-    BigInteger(unsigned long long n = 0);
+    BigInteger(uint64_t n = 0);
 
     BigInteger(std::string &);
 
@@ -34,8 +35,6 @@ public:
     friend bool Null(const BigInteger &);
 
     friend int Length(const BigInteger &);
-
-    int operator[] (int) const;
 
     const void *address() { return reinterpret_cast<void *>(digits.data()); }
 
@@ -60,7 +59,7 @@ public:
     BigInteger operator -- (int);
 
     // Cast to uint64_t:
-    explicit operator uint64() const;
+    explicit operator uint64_t() const;
 
     //Addition and Subtraction
     friend BigInteger &operator += (BigInteger &, const BigInteger &);
@@ -107,6 +106,16 @@ public:
     static BigInteger factorial(int n);
 };
 
+namespace BigConstants
+{
+    static const BigInteger ZERO = static_cast<uint64_t>(0);
+    static const BigInteger ONE  = static_cast<uint64_t>(1);
+    static const BigInteger TWO  = static_cast<uint64_t>(2);
+    static const BigInteger FIVE = static_cast<uint64_t>(5);
+    static const BigInteger TEN  = static_cast<uint64_t>(10);
+    static const BigInteger HUND = static_cast<uint64_t>(100);
+}
+
 BigInteger::BigInteger(std::string &s)
 {
     digits = "";
@@ -128,7 +137,8 @@ BigInteger::BigInteger(std::string &s)
         digits.push_back(static_cast<char>(s[i] - '0'));
     }
 }
-BigInteger::BigInteger(unsigned long long nr)
+
+BigInteger::BigInteger(uint64_t nr)
 {
     do
     {
@@ -192,7 +202,7 @@ std::string BigInteger::hex() const
 
     while (!Null(quotient))
     {
-        hex_repr += HEX_DIGITS[static_cast<uint64>(quotient % 16)];
+        hex_repr += HEX_DIGITS[static_cast<uint64_t>(quotient % 16)];
         quotient /= 16;
     }
     std::reverse(hex_repr.begin(), hex_repr.end());
@@ -200,15 +210,11 @@ std::string BigInteger::hex() const
     return hex_repr;
 }
 
-int BigInteger::operator [] (const int index) const
-{
-    if(digits.size() <= index || index < 0) {
-        throw std::invalid_argument("Out of bounds array index.");
-    }
+int BigInteger::operator [] (const int index) const {
     return digits[index];
 }
 
-BigInteger::operator uint64() const
+BigInteger::operator uint64_t() const
 {
     static const BigInteger LIMIT = UINT64_MAX;
 
@@ -216,7 +222,7 @@ BigInteger::operator uint64() const
         throw std::invalid_argument("BigInteger higher than ULL max value.");
     }
     char data[30];
-    int i = static_cast<int>(digits.size());
+    uint64_t i = static_cast<int>(digits.size());
 
     data[i] = '\0';
 
@@ -415,7 +421,7 @@ BigInteger &operator *= (BigInteger &a, const BigInteger &b)
 {
     if(Null(a) || Null(b))
     {
-        a = BigInteger();
+        a = BigConstants::ZERO;
         return a;
     }
 
@@ -452,7 +458,6 @@ BigInteger operator * (const BigInteger &a, const BigInteger &b)
 {
     BigInteger temp(a);
     temp *= b;
-
     return temp;
 }
 
@@ -463,12 +468,12 @@ BigInteger &operator /= (BigInteger& a, const BigInteger &b)
     }
     if(a < b)
     {
-        a = BigInteger();
+        a = BigConstants::ZERO;
         return a;
     }
     if(a == b)
     {
-        a = BigInteger(1);
+        a = BigConstants::ONE;
         return a;
     }
     int i, lgcat = 0, cc;
@@ -498,27 +503,26 @@ BigInteger &operator /= (BigInteger& a, const BigInteger &b)
 
     return a;
 }
+
 BigInteger operator / (const BigInteger &a, const BigInteger &b)
 {
-    BigInteger temp;
-
-    temp = a;
+    BigInteger temp(a);
     temp /= b;
-
     return temp;
 }
 
 BigInteger &operator %= (BigInteger &a, const BigInteger &b)
 {
-    if(Null(b))
+    if(Null(b)) {
         throw std::invalid_argument("Arithmetic Error: Division By 0");
+    }
     if(a < b)
     {
         return a;
     }
     if(a == b)
     {
-        a = BigInteger(1);
+        a = BigConstants::ZERO;
         return a;
     }
     int i, lgcat = 0, cc;
@@ -527,16 +531,15 @@ BigInteger &operator %= (BigInteger &a, const BigInteger &b)
     std::vector<int> cat(n, 0);
 
     BigInteger t;
-    const BigInteger TEN(10);
 
-    for (i = n - 1; t * TEN + a.digits[i] < b;i--)
+    for (i = n - 1; t * BigConstants::TEN + a.digits[i] < b;i--)
     {
-        t *= TEN;
+        t *= BigConstants::TEN;
         t += a.digits[i];
     }
     for (; i >= 0; i--)
     {
-        t = t * TEN + a.digits[i];
+        t = t * BigConstants::TEN + a.digits[i];
         for (cc = 9; cc * b > t;cc--);
         t -= cc * b;
         cat[lgcat++] = cc;
@@ -544,11 +547,11 @@ BigInteger &operator %= (BigInteger &a, const BigInteger &b)
     a = std::move(t);
     return a;
 }
+
 BigInteger operator % (const BigInteger &a, const BigInteger &b)
 {
     BigInteger temp(a);
     temp %= b;
-    std::cout << a << " % " << b << " = " << temp << std::endl;
     return temp;
 }
 
@@ -559,8 +562,9 @@ BigInteger &operator ^= (BigInteger &a, const BigInteger &b)
 
     while(!Null(Exponent))
     {
-        if(Exponent[0] & 1)
+        if(Exponent[0] & 1) {
             a *= Base;
+        }
         Base *= Base;
         divide_by_2(Exponent);
     }
@@ -615,7 +619,7 @@ BigInteger sqrt(BigInteger & a)
             --mid;
             right = std::move(mid);
         }
-        mid = BigInteger();
+        mid = BigConstants::ZERO;
     }
     return v;
 }
@@ -624,12 +628,12 @@ BigInteger BigInteger::catalan(int n)
 {
     BigInteger a(1), b;
 
-    for (int i = 2; i <= n;i++)
+    for (BigInteger i = BigConstants::TWO; i <= n; ++i)
         a *= i;
 
     b = a;
 
-    for (int i = n + 1; i <= 2 * n;i++)
+    for (BigInteger i = n + 1; i <= BigConstants::TWO * n; ++i)
         b *= i;
 
     a *= a;
@@ -660,7 +664,7 @@ BigInteger BigInteger::factorial(int n)
 {
     BigInteger f(1);
 
-    for (int i = 2; i <= n;i++) {
+    for (BigInteger i = BigConstants::TWO; i <= n; ++i) {
         f *= i;
     }
     return f;
