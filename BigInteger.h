@@ -6,8 +6,6 @@
 #include <vector>
 #include <exception>
 
-#define LOG 1
-
 
 class BigInteger {
 private:
@@ -210,9 +208,6 @@ BigInteger &BigInteger::operator = (const BigInteger &other)
     if (this != &other) {
         this->digits = other.digits;
     }
-#ifdef LOG
-    std::cout << "Copy Assigned!\n";
-#endif
     return *this;
 }
 
@@ -221,9 +216,6 @@ BigInteger &BigInteger::operator = (BigInteger &&other) noexcept
     if (this != &other) {
         this->digits = std::move(other.digits);
     }
-#ifdef LOG
-    std::cout << "Move Assigned!\n";
-#endif
     return *this;
 }
 
