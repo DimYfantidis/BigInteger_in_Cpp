@@ -31,10 +31,9 @@ int main()
 {
     int n;
 
+
     std::cout << "Give number: ";
     std::cin >> n;
-
-    std::cout << '\n';
 
     timer t(std::cout);
 
@@ -52,6 +51,19 @@ int main()
     std::cout << "\nEXPR: fibonacci(" << n << ")^2 = " << u1 << '\n'
               << "\nEXPR: " << n << "! % catalan(" << n << ") = " << u2 << '\n'
               << std::endl;
+
+    uint64_t a;
+
+    BigInteger u3(u2++);
+
+    try
+    {
+        a = static_cast<uint64_t>(fib_n);
+    }
+    catch (std::exception &e)
+    {
+        std::cout << ">>> " << e.what() << std::endl;
+    }
 
     return EXIT_SUCCESS;
 }
