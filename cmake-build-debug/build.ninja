@@ -61,6 +61,12 @@ build CMakeFiles/BigInteger.dir/BigInteger.cpp.obj: CXX_COMPILER__BigInteger_Deb
   OBJECT_DIR = CMakeFiles\BigInteger.dir
   OBJECT_FILE_DIR = CMakeFiles\BigInteger.dir
 
+build CMakeFiles/BigInteger.dir/BigDecimal.cpp.obj: CXX_COMPILER__BigInteger_Debug C$:/Users/axaio/CLionProjects/BigInteger/BigDecimal.cpp || cmake_object_order_depends_target_BigInteger
+  DEP_FILE = CMakeFiles\BigInteger.dir\BigDecimal.cpp.obj.d
+  FLAGS = -g -std=gnu++2a
+  OBJECT_DIR = CMakeFiles\BigInteger.dir
+  OBJECT_FILE_DIR = CMakeFiles\BigInteger.dir
+
 
 # =============================================================================
 # Link build statements for EXECUTABLE target BigInteger
@@ -69,7 +75,7 @@ build CMakeFiles/BigInteger.dir/BigInteger.cpp.obj: CXX_COMPILER__BigInteger_Deb
 #############################################
 # Link the executable BigInteger.exe
 
-build BigInteger.exe: CXX_EXECUTABLE_LINKER__BigInteger_Debug CMakeFiles/BigInteger.dir/main.cpp.obj CMakeFiles/BigInteger.dir/BigInteger.cpp.obj
+build BigInteger.exe: CXX_EXECUTABLE_LINKER__BigInteger_Debug CMakeFiles/BigInteger.dir/main.cpp.obj CMakeFiles/BigInteger.dir/BigInteger.cpp.obj CMakeFiles/BigInteger.dir/BigDecimal.cpp.obj
   FLAGS = -g
   LINK_LIBRARIES = -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
   OBJECT_DIR = CMakeFiles\BigInteger.dir

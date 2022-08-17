@@ -3,8 +3,16 @@
 
 /* * * * * * * * * * * Constructors * * * * * * * * * * */
 
-BigInteger::BigInteger(uint64_t nr)
+BigInteger::BigInteger(int64_t nr)
 {
+    if (nr < 0)
+    {
+        sign = NEGATIVE;
+        nr = -nr;
+    }
+    else
+        sign = POSITIVE;
+
     do
     {
         digits.push_back(static_cast<char>(nr % 10));
@@ -18,8 +26,17 @@ BigInteger::BigInteger(std::string &s)
     digits = "";
 
     int n = static_cast<int>(s.size());
+    int end = 0;
 
-    for (int i = n - 1; i >= 0; i--)
+    if (s[0] == '-')
+    {
+        sign = NEGATIVE;
+        ++end;
+    }
+
+    if (s[0] == '+') ++end;
+
+    for (int i = n - 1; i >= end; i--)
     {
         if(!isdigit(s[i]))
         {
@@ -39,7 +56,17 @@ BigInteger::BigInteger(const char *s)
 {
     digits = "";
 
-    for (int i = static_cast<int>(strlen(s)) - 1; i >= 0; i--)
+    int n = static_cast<int>(strlen(s));
+    int end = 0;
+
+    if (s[0] == '-')
+    {
+        sign = NEGATIVE;
+        ++end;
+    }
+    if (s[0] == '+') ++end;
+
+    for (int i = n - 1; i >= end; i--)
     {
         if(!isdigit(s[i]))
         {
@@ -86,10 +113,49 @@ int Length(const BigInteger &a) {
     return static_cast<int>(a.digits.size());
 }
 
+void swap(BigInteger &a, BigInteger &b)
+{
+    BigInteger c = std::move(a);
+
+    a = std::move(b);
+    b = std::move(c);
+
+    std::swap(a.sign, b.sign);
+}
+
+bool abs_less(const BigInteger &a, const BigInteger &b)
+{
+    int n = Length(a);
+    int m = Length(b);
+
+    if(n != m) {
+        return n < m;
+    }
+
+    while(n--)
+    {
+        if (a.digits[n] != b.digits[n])
+            return a.digits[n] < b.digits[n];
+    }
+    return false;
+}
+
+bool abs_more(const BigInteger &a, const BigInteger &b)
+{
+    const BigInteger &c = b;
+    const BigInteger &d = a;
+    return abs_less(c, d);
+}
+
+bool abs_equals(const BigInteger &a, const BigInteger &b) {
+    return a.digits == b.digits;
+}
+
+
 // -------- Decimal String representation --------
 std::string BigInteger::toString() const
 {
-    std::string str;
+    std::string str = (sign == NEGATIVE ? "-" : "");
 
     for (int i = 0; i < digits.size(); ++i) {
         str += static_cast<char>(digits[digits.size() - i - 1] + '0');
@@ -110,9 +176,11 @@ std::string BigInteger::hex() const
 
     while (!Null(quotient))
     {
-        hex_repr += HEX_DIGITS[static_cast<uint64_t>(quotient % 16)];
+        hex_repr += HEX_DIGITS[static_cast<int64_t>(quotient % 16)];
         quotient /= 16;
     }
+    if (sign == NEGATIVE) hex_repr += '-';
+
     std::reverse(hex_repr.begin(), hex_repr.end());
 
     return hex_repr;
@@ -124,7 +192,9 @@ std::string BigInteger::hex() const
 // -------- Direct assignment --------
 BigInteger &BigInteger::operator = (const BigInteger &other)
 {
-    if (this != &other) {
+    if (this != &other)
+    {
+        this->sign = other.sign;
         this->digits = other.digits;
     }
     return *this;
@@ -132,7 +202,9 @@ BigInteger &BigInteger::operator = (const BigInteger &other)
 
 BigInteger &BigInteger::operator = (BigInteger &&other) noexcept
 {
-    if (this != &other) {
+    if (this != &other)
+    {
+        this->sign = other.sign;
         this->digits = std::move(other.digits);
     }
     return *this;
@@ -144,33 +216,65 @@ BigInteger &BigInteger::operator ++ () &
     int i;
     int n = static_cast<int>(digits.size());
 
-    for (i = 0; i < n && digits[i] == 9; i++) {
-        digits[i] = 0;
+    if (sign == POSITIVE)
+    {
+        for (i = 0; i < n && digits[i] == 9; i++) {
+            digits[i] = 0;
+        }
+        if(i == n) {
+            digits.push_back(1);
+        }
+        else {
+            digits[i]++;
+        }
     }
-    if(i == n) {
-        digits.push_back(1);
-    }
-    else {
-        digits[i]++;
+    else
+    {
+        for (i = 0; digits[i] == 0 && i < n; i++) {
+            digits[i] = 9;
+        }
+        digits[i]--;
+
+        if(n > 1 && digits[n - 1] == 0) {
+            digits.pop_back();
+        }
+
+        if (Null(*this))
+            sign = POSITIVE;
     }
     return *this;
 }
 
 BigInteger &BigInteger::operator -- () &
 {
-    if(digits[0] == 0 && digits.size() == 1) {
-        throw std::underflow_error("");
-    }
     int i;
     int n = static_cast<int>(digits.size());
 
-    for (i = 0; digits[i] == 0 && i < n; i++) {
-        digits[i] = 9;
-    }
-    digits[i]--;
+    if (sign == NEGATIVE)
+    {
+        for (i = 0; i < n && digits[i] == 9; i++) {
+            digits[i] = 0;
+        }
+        if(i == n) {
+            digits.push_back(1);
+        }
+        else {
+            digits[i]++;
+        }
 
-    if(n > 1 && digits[n - 1] == 0) {
-        digits.pop_back();
+        if (Null(*this))
+            sign = POSITIVE;
+    }
+    else
+    {
+        for (i = 0; digits[i] == 0 && i < n; i++) {
+            digits[i] = 9;
+        }
+        digits[i]--;
+
+        if(n > 1 && digits[n - 1] == 0) {
+            digits.pop_back();
+        }
     }
     return *this;
 }
@@ -194,11 +298,11 @@ BigInteger BigInteger::operator -- (int) &
 }
 
 // -------- Cast to uint64_t --------
-BigInteger::operator uint64_t() const
+BigInteger::operator int64_t() const
 {
-    static const BigInteger LIMIT = UINT64_MAX;
+    static const BigInteger LIMIT = INT64_MAX;
 
-    if (*this > LIMIT)
+    if (abs(*this) > LIMIT)
     {
         std::string err_message;
 
@@ -219,12 +323,14 @@ BigInteger::operator uint64_t() const
             err_message += buffer;
             err_message += "...";
         }
-        err_message += " higher than uint64_t max value.";
+        err_message += " out of int64_t data type bounds.";
 
         throw std::invalid_argument(err_message);
     }
     char data[30];
-    uint64_t i = static_cast<int>(digits.size());
+
+    uint64_t i = digits.size();
+    int64_t res;
 
     data[i] = '\0';
 
@@ -233,9 +339,9 @@ BigInteger::operator uint64_t() const
     }
     data[i] = '\0';
 
-    i = strtoull(data, nullptr, 10);
+    res = strtoll(data, nullptr, 10);
 
-    return i;
+    return res;
 }
 
 // -------- Subscript operator --------
@@ -253,32 +359,63 @@ BigInteger &operator += (BigInteger &a, const BigInteger& b)
     int n = Length(a);
     int m = Length(b);
 
-    if(m > n) {
-        a.digits.append(m - n, 0);
-    }
-    n = Length(a);
-
-    for (i = 0; i < n; i++)
+    if (a.sign == b.sign)
     {
-        if(i < m)
-            s = (a.digits[i] + b.digits[i]) + t;
-        else
-            s = a.digits[i] + t;
+        if (m > n) {
+            a.digits.append(m - n, 0);
+        }
+        n = Length(a);
 
-        t = s / 10;
+        for (i = 0; i < n; i++)
+        {
+            if(i < m)
+                s = (a.digits[i] + b.digits[i]) + t;
+            else
+                s = a.digits[i] + t;
+            t = s / 10;
 
-        a.digits[i] = static_cast<char>(s % 10);
+            a.digits[i] = static_cast<char>(s % 10);
+        }
+        if (t) a.digits.push_back(static_cast<char>(t));
     }
-    if (t) a.digits.push_back(static_cast<char>(t));
+    else
+    {
+        BigInteger c;
 
+        const BigInteger *d;
+
+        if (abs_less(a, b))
+        {
+            c = b;
+            swap(a, c);
+            std::swap(a.sign, c.sign);
+            std::swap(m, n);
+            d = &c;
+        }
+        else
+            d = &b;
+
+        for (i = 0; i < n; i++)
+        {
+            if(i < m)
+                s = a.digits[i] - d->digits[i]+ t;
+            else
+                s = a.digits[i] + t;
+            if(s < 0)
+                s += 10, t = -1;
+            else
+                t = 0;
+
+            a.digits[i] = static_cast<char>(s);
+        }
+        while(n > 1 && a.digits[n - 1] == 0)
+            a.digits.pop_back(), n--;
+    }
     return a;
 }
 
 BigInteger &operator -= (BigInteger&a, const BigInteger &b)
 {
-    if(a < b) {
-        throw std::underflow_error("");
-    }
     int n = Length(a);
     int m = Length(b);
 
@@ -286,21 +423,57 @@ BigInteger &operator -= (BigInteger&a, const BigInteger &b)
     int s;
     int t = 0;
 
-    for (i = 0; i < n; i++)
+    if (a.sign != b.sign)
     {
-        if(i < m)
-            s = a.digits[i] - b.digits[i]+ t;
-        else
-            s = a.digits[i]+ t;
-        if(s < 0)
-            s += 10, t = -1;
-        else
-            t = 0;
+        if (m > n) {
+            a.digits.append(m - n, 0);
+        }
+        n = Length(a);
 
-        a.digits[i] = static_cast<char>(s);
+        for (i = 0; i < n; i++)
+        {
+            if(i < m)
+                s = (a.digits[i] + b.digits[i]) + t;
+            else
+                s = a.digits[i] + t;
+            t = s / 10;
+
+            a.digits[i] = static_cast<char>(s % 10);
+        }
+        if (t) a.digits.push_back(static_cast<char>(t));
     }
-    while(n > 1 && a.digits[n - 1] == 0)
-        a.digits.pop_back(), n--;
+    else
+    {
+        BigInteger c;
+
+        const BigInteger *d;
+
+        if (n < m || abs_less(a, b))
+        {
+            c = b;
+            swap(a, c);
+            std::swap(m, n);
+            d = &c;
+        }
+        else
+            d = &b;
+
+        for (i = 0; i < n; i++)
+        {
+            if (i < m)
+                s = a.digits[i] - d->digits[i]+ t;
+            else
+                s = a.digits[i] + t;
+            if (s < 0)
+                s += 10, t = -1;
+            else
+                t = 0;
+
+            a.digits[i] = static_cast<char>(s);
+        }
+        while(n > 1 && a.digits[n - 1] == 0)
+            a.digits.pop_back(), n--;
+    }
 
     return a;
 }
@@ -321,6 +494,9 @@ BigInteger operator - (const BigInteger& a, const BigInteger& b)
 
 // -------- Comparison operators --------
 bool operator == (const BigInteger &a, const BigInteger &b) {
+    if (a.sign != b.sign) {
+        return false;
+    }
     return a.digits == b.digits;
 }
 
@@ -336,6 +512,10 @@ bool operator < (const BigInteger&a, const BigInteger&b)
 {
     int n = Length(a);
     int m = Length(b);
+
+    if (a.sign != b.sign) {
+        return a.sign == NEGATIVE;
+    }
 
     if(n != m) {
         return n < m;
@@ -501,8 +681,10 @@ BigInteger operator % (const BigInteger &a, const BigInteger &b)
 // -------- Power Function --------
 BigInteger &operator ^= (BigInteger &a, const BigInteger &b)
 {
-    BigInteger Exponent(b), Base(a);
-    a = 1;
+    BigInteger Exponent(b);
+    BigInteger Base(a);
+
+    a = BigConstants::ONE;
 
     while(!Null(Exponent))
     {
@@ -520,37 +702,6 @@ BigInteger operator ^ (const BigInteger &a, const BigInteger &b)
     BigInteger temp(a);
     temp ^= b;
     return temp;
-}
-
-// -------- Square Root Function --------
-BigInteger sqrt(BigInteger & a)
-{
-    BigInteger left(1), right(a), v(1), mid, prod;
-
-    divide_by_2(right);
-
-    while(left <= right)
-    {
-        mid += left;
-        mid += right;
-
-        divide_by_2(mid);
-
-        prod = (mid * mid);
-
-        if(prod <= a)
-        {
-            v = mid;
-            ++mid;
-            left = std::move(mid);
-        }
-        else{
-            --mid;
-            right = std::move(mid);
-        }
-        mid = BigConstants::ZERO;
-    }
-    return v;
 }
 
 // -------- Read and Write --------
@@ -581,10 +732,61 @@ std::istream &operator >> (std::istream &is, BigInteger &a)
 
 std::ostream &operator << (std::ostream &os, const BigInteger &a)
 {
+    if (a.sign == NEGATIVE) {
+        os << '-';
+    }
     for (int i = static_cast<int>(a.digits.size()) - 1; i >= 0; i--) {
         os << static_cast<short>(a.digits[i]);
     }
     return os;
+}
+
+// -------- Square Root Function --------
+BigInteger BigInteger::sqrt(const BigInteger &n)
+{
+    BigInteger left(1), right(n), v(1), mid, prod;
+
+    divide_by_2(right);
+
+    while(left <= right)
+    {
+        mid += left;
+        mid += right;
+
+        divide_by_2(mid);
+
+        prod = (mid * mid);
+
+        if(prod <= n)
+        {
+            v = mid;
+            ++mid;
+            left = std::move(mid);
+        }
+        else{
+            --mid;
+            right = std::move(mid);
+        }
+        mid = BigConstants::ZERO;
+    }
+    return v;
+}
+
+BigInteger BigInteger::log2(const BigInteger &n) {
+    return { static_cast<int64_t>(LOG2_10 * (double)(n.digits.size() - 1)) };
+}
+
+BigInteger BigInteger::log10(const BigInteger &n) {
+    return { static_cast<int64_t>(n.digits.size() - 1) };
+}
+
+BigInteger BigInteger::abs(const BigInteger &n)
+{
+    BigInteger abs_n(n);
+
+    abs_n.sign = POSITIVE;
+
+    return abs_n;
 }
 
 BigInteger BigInteger::catalan(int n)
@@ -632,3 +834,7 @@ BigInteger BigInteger::factorial(int n)
     }
     return f;
 }
+
+#undef LOG2_10
+#undef POSITIVE
+#undef NEGATIVE

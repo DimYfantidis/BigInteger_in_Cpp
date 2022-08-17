@@ -10,15 +10,22 @@
 #include <climits>
 #include <algorithm>
 #include <cstdint>
+#include <cmath>
 
+#define LOG2_10 3.32192809489
+
+#define POSITIVE false
+#define NEGATIVE true
 
 class BigInteger {
 private:
+    bool sign;
+
     std::string digits;
 
 public:
     //Constructors:
-    BigInteger(uint64_t n = 0);
+    BigInteger(int64_t n = 0);
 
     BigInteger(std::string &);
 
@@ -40,6 +47,13 @@ public:
 
     const void *address() { return reinterpret_cast<void *>(digits.data()); }
 
+    friend void swap(BigInteger &a, BigInteger &b);
+
+    friend bool abs_less(const BigInteger &a, const BigInteger &b);
+
+    friend bool abs_more(const BigInteger &a, const BigInteger &b);
+
+    friend bool abs_equals(const BigInteger &a, const BigInteger &b);
 
     // Decimal String representation:
     std::string toString() const;
@@ -68,7 +82,7 @@ public:
     BigInteger operator -- (int) && = delete;
 
     // Cast to uint64_t
-    explicit operator uint64_t() const;
+    explicit operator int64_t() const;
 
     // Subscript operator
     int operator[] (int) const;
@@ -105,12 +119,18 @@ public:
     friend BigInteger &operator ^= (BigInteger &, const BigInteger &);
     friend BigInteger operator ^ (const BigInteger &, const BigInteger &);
 
-    // Square Root Function
-    friend BigInteger sqrt(BigInteger &a);
-
     // Read and Write
     friend std::ostream &operator << (std::ostream &, const BigInteger &);
     friend std::istream &operator >> (std::istream &, BigInteger &);
+
+
+    /* * * * Arithmetic functions * * * */
+
+    // Basic functions
+    static BigInteger sqrt(const BigInteger &);
+    static BigInteger log2(const BigInteger &);
+    static BigInteger log10(const BigInteger &);
+    static BigInteger abs(const BigInteger &);
 
     // Others
     static BigInteger catalan(int n);
@@ -120,12 +140,12 @@ public:
 
 namespace BigConstants
 {
-    static const BigInteger ZERO = static_cast<uint64_t>(0);
-    static const BigInteger ONE  = static_cast<uint64_t>(1);
-    static const BigInteger TWO  = static_cast<uint64_t>(2);
-    static const BigInteger FIVE = static_cast<uint64_t>(5);
-    static const BigInteger TEN  = static_cast<uint64_t>(10);
-    static const BigInteger HUND = static_cast<uint64_t>(100);
+    static const BigInteger ZERO = static_cast<int64_t>(0);
+    static const BigInteger ONE  = static_cast<int64_t>(1);
+    static const BigInteger TWO  = static_cast<int64_t>(2);
+    static const BigInteger FIVE = static_cast<int64_t>(5);
+    static const BigInteger TEN  = static_cast<int64_t>(10);
+    static const BigInteger HUND = static_cast<int64_t>(100);
 }
 
 #endif //BIGINTEGER_BIGINTEGER_H
