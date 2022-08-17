@@ -55,8 +55,11 @@ public:
     BigInteger &operator = (BigInteger &&) noexcept;
 
     // Post/Pre - Incrementation
-    BigInteger &operator ++ ();
-    BigInteger &operator -- ();
+    BigInteger &operator ++ () &;
+    BigInteger &operator -- () &;
+
+    BigInteger &operator ++ () && = delete;
+    BigInteger &operator -- () && = delete;
 
     BigInteger operator ++ (int) &;
     BigInteger operator -- (int) &;

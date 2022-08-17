@@ -54,8 +54,6 @@ int main()
 
     uint64_t a;
 
-    BigInteger u3(u2++);
-
     try
     {
         a = static_cast<uint64_t>(fib_n);

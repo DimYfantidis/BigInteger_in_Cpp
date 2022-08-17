@@ -139,7 +139,7 @@ BigInteger &BigInteger::operator = (BigInteger &&other) noexcept
 }
 
 // -------- Post/Pre - Incrementation --------
-BigInteger &BigInteger::operator ++ ()
+BigInteger &BigInteger::operator ++ () &
 {
     int i;
     int n = static_cast<int>(digits.size());
@@ -165,7 +165,7 @@ BigInteger BigInteger::operator ++ (int) &
     return aux;
 }
 
-BigInteger &BigInteger::operator -- ()
+BigInteger &BigInteger::operator -- () &
 {
     if(digits[0] == 0 && digits.size() == 1) {
         throw std::underflow_error("");
