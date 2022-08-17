@@ -1,5 +1,6 @@
 #include <iostream>
 #include <chrono>
+#include <cmath>
 
 #include "BigInteger.h"
 
@@ -30,7 +31,6 @@ public:
 int main()
 {
     int n;
-
 
     std::cout << "Give number: ";
     std::cin >> n;
