@@ -302,7 +302,7 @@ BigInteger::operator int64_t() const
 {
     static const BigInteger LIMIT = INT64_MAX;
 
-    if (abs(*this) > LIMIT)
+    if (abs_more(*this, LIMIT))
     {
         std::string err_message;
 
@@ -573,6 +573,8 @@ BigInteger &operator *= (BigInteger &a, const BigInteger &b)
     for (i = n - 1; i >= 1 && !v[i]; i--)
         a.digits.pop_back();
 
+    a.sign = (a.sign != b.sign ? NEGATIVE : POSITIVE);
+
     return a;
 }
 
@@ -615,6 +617,8 @@ BigInteger &operator /= (BigInteger& a, const BigInteger &b)
         a.digits[i] = static_cast<char>(cat[lgcat - i - 1]);
 
     a.digits.resize(lgcat);
+
+    a.sign = (a.sign != b.sign ? NEGATIVE : POSITIVE);
 
     return a;
 }
@@ -681,6 +685,9 @@ BigInteger operator % (const BigInteger &a, const BigInteger &b)
 // -------- Power Function --------
 BigInteger &operator ^= (BigInteger &a, const BigInteger &b)
 {
+    if (b.sign == NEGATIVE) {
+        throw std::invalid_argument("Positive Exponents only");
+    }
     BigInteger Exponent(b);
     BigInteger Base(a);
 
@@ -693,6 +700,22 @@ BigInteger &operator ^= (BigInteger &a, const BigInteger &b)
         }
         Base *= Base;
         divide_by_2(Exponent);
+    }
+
+    if (a.sign == NEGATIVE)
+    {
+        try
+        {
+            if (static_cast<int64_t>(b) % 2 == 0) {
+                a.sign = POSITIVE;
+            }
+        }
+        catch (std::exception &e)
+        {
+            if (b % BigConstants::TWO == BigConstants::ZERO) {
+                a.sign = POSITIVE;
+            }
+        }
     }
     return a;
 }
@@ -735,7 +758,7 @@ std::ostream &operator << (std::ostream &os, const BigInteger &a)
     if (a.sign == NEGATIVE) {
         os << '-';
     }
-    for (int i = static_cast<int>(a.digits.size()) - 1; i >= 0; i--) {
+    for (int i = static_cast<int>(a.digits.size()) - 1; i > 0; i--) {
         os << static_cast<short>(a.digits[i]);
     }
     return os;

@@ -19,8 +19,6 @@ int main()
 
     t.unpause();
 
-    BigInteger N;
-
     BigInteger fib_n  = BigInteger::fibonacci(n);
     BigInteger fact_n = BigInteger::factorial(n);
     BigInteger cat_n  = BigInteger::catalan(n);
