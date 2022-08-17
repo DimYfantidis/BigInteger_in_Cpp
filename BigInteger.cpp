@@ -156,15 +156,6 @@ BigInteger &BigInteger::operator ++ () &
     return *this;
 }
 
-BigInteger BigInteger::operator ++ (int) &
-{
-    BigInteger aux(*this);
-
-    ++(*this);
-
-    return aux;
-}
-
 BigInteger &BigInteger::operator -- () &
 {
     if(digits[0] == 0 && digits.size() == 1) {
@@ -182,6 +173,15 @@ BigInteger &BigInteger::operator -- () &
         digits.pop_back();
     }
     return *this;
+}
+
+BigInteger BigInteger::operator ++ (int) &
+{
+    BigInteger aux(*this);
+
+    ++(*this);
+
+    return aux;
 }
 
 BigInteger BigInteger::operator -- (int) &
