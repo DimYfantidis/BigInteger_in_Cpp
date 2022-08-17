@@ -33,7 +33,7 @@ public:
 
     BigInteger(const BigInteger &) = default;
 
-    BigInteger(BigInteger &&other) noexcept : digits(other.digits) {}
+    BigInteger(BigInteger &&other) noexcept : digits(std::move(other.digits)), sign(other.sign) {}
 
     ~BigInteger() = default;
 
@@ -54,6 +54,7 @@ public:
     friend bool abs_more(const BigInteger &a, const BigInteger &b);
 
     friend bool abs_equals(const BigInteger &a, const BigInteger &b);
+
 
     // Decimal String representation:
     std::string toString() const;
