@@ -17,6 +17,7 @@
 #define POSITIVE false
 #define NEGATIVE true
 
+
 class BigInteger {
 private:
     bool sign;

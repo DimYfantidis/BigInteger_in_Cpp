@@ -810,14 +810,14 @@ BigInteger BigInteger::sqrt(const BigInteger &n)
 
 BigInteger BigInteger::log2(const BigInteger &n) {
     if (n.sign == NEGATIVE) {
-        throw std::invalid_argument("Arithmetic Error: log2(x) not difined for negative x.");
+        throw std::invalid_argument("Arithmetic Error: log2(x) not defined for negative x.");
     }
     return { static_cast<int64_t>(LOG2_10 * (double)(n.digits.size() - 1)) };
 }
 
 BigInteger BigInteger::log10(const BigInteger &n) {
     if (n.sign == NEGATIVE) {
-        throw std::invalid_argument("Arithmetic Error: log10(x) not difined for negative x.");
+        throw std::invalid_argument("Arithmetic Error: log10(x) not defined for negative x.");
     }
     return { static_cast<int64_t>(n.digits.size() - 1) };
 }
