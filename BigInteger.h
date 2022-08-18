@@ -55,6 +55,11 @@ public:
 
     friend bool abs_equals(const BigInteger &a, const BigInteger &b);
 
+    // Quick Modulus
+    BigInteger mod_2() const;
+    BigInteger mod_5() const;
+    BigInteger mod_10() const;
+
 
     // Decimal String representation:
     std::string toString() const;

@@ -82,7 +82,6 @@ BigInteger::BigInteger(const char *s)
     }
 }
 
-
 /* * * * * * * * * * * Auxiliary Functions * * * * * * * * * * */
 
 void divide_by_2(BigInteger & a)
@@ -151,6 +150,27 @@ bool abs_equals(const BigInteger &a, const BigInteger &b) {
     return a.digits == b.digits;
 }
 
+// -------- Quick Modulus --------
+
+BigInteger BigInteger::mod_2() const
+{
+    if (digits[0] % 2) {
+        return BigConstants::ZERO;
+    }
+    return BigConstants::ONE;
+}
+
+BigInteger BigInteger::mod_5() const
+{
+    if (digits[0] >= 5) {
+        return { digits[0] - 5 };
+    }
+    return { digits[0] };
+}
+
+BigInteger BigInteger::mod_10() const {
+    return { digits[0] };
+}
 
 // -------- Decimal String representation --------
 std::string BigInteger::toString() const
@@ -643,8 +663,7 @@ BigInteger &operator %= (BigInteger &a, const BigInteger &b)
     if(Null(b)) {
         throw std::invalid_argument("Arithmetic Error: Division By 0");
     }
-    if(a < b)
-    {
+    if(a < b) {
         return a;
     }
     if(a == b)
@@ -667,7 +686,7 @@ BigInteger &operator %= (BigInteger &a, const BigInteger &b)
     for (; i >= 0; i--)
     {
         t = t * BigConstants::TEN + a.digits[i];
-        for (cc = 9; cc * b > t;cc--);
+        for (cc = 9; cc * b > t; cc--);
         t -= cc * b;
         cat[lgcat++] = cc;
     }
@@ -704,17 +723,8 @@ BigInteger &operator ^= (BigInteger &a, const BigInteger &b)
 
     if (a.sign == NEGATIVE)
     {
-        try
-        {
-            if (static_cast<int64_t>(b) % 2 == 0) {
-                a.sign = POSITIVE;
-            }
-        }
-        catch (std::exception &e)
-        {
-            if (b % BigConstants::TWO == BigConstants::ZERO) {
-                a.sign = POSITIVE;
-            }
+        if (b.mod_2() == BigConstants::ZERO) {
+           a.sign = POSITIVE;
         }
     }
     return a;
@@ -758,7 +768,7 @@ std::ostream &operator << (std::ostream &os, const BigInteger &a)
     if (a.sign == NEGATIVE) {
         os << '-';
     }
-    for (int i = static_cast<int>(a.digits.size()) - 1; i > 0; i--) {
+    for (int i = static_cast<int>(a.digits.size()) - 1; i >= 0; i--) {
         os << static_cast<short>(a.digits[i]);
     }
     return os;
@@ -767,6 +777,9 @@ std::ostream &operator << (std::ostream &os, const BigInteger &a)
 // -------- Square Root Function --------
 BigInteger BigInteger::sqrt(const BigInteger &n)
 {
+    if (n.sign == NEGATIVE) {
+        throw std::invalid_argument("Arithmetic Error: sqrt(x) not difined for negative x.");
+    }
     BigInteger left(1), right(n), v(1), mid, prod;
 
     divide_by_2(right);
@@ -796,10 +809,16 @@ BigInteger BigInteger::sqrt(const BigInteger &n)
 }
 
 BigInteger BigInteger::log2(const BigInteger &n) {
+    if (n.sign == NEGATIVE) {
+        throw std::invalid_argument("Arithmetic Error: log2(x) not difined for negative x.");
+    }
     return { static_cast<int64_t>(LOG2_10 * (double)(n.digits.size() - 1)) };
 }
 
 BigInteger BigInteger::log10(const BigInteger &n) {
+    if (n.sign == NEGATIVE) {
+        throw std::invalid_argument("Arithmetic Error: log10(x) not difined for negative x.");
+    }
     return { static_cast<int64_t>(n.digits.size() - 1) };
 }
 
@@ -815,13 +834,16 @@ BigInteger BigInteger::abs(const BigInteger &n)
 BigInteger BigInteger::catalan(int n)
 {
     BigInteger a(1), b;
+    BigInteger N(n);
 
-    for (BigInteger i = BigConstants::TWO; i <= n; ++i)
+    for (BigInteger i = 2; i <= N; ++i)
         a *= i;
 
     b = a;
 
-    for (BigInteger i = n + 1; i <= BigConstants::TWO * n; ++i)
+    BigInteger _2n = BigConstants::TWO * n;
+
+    for (BigInteger i = n + 1; i <= _2n; ++i)
         b *= i;
 
     a *= a;
@@ -851,8 +873,9 @@ BigInteger BigInteger::fibonacci(int n)
 BigInteger BigInteger::factorial(int n)
 {
     BigInteger f(1);
+    BigInteger N(n);
 
-    for (BigInteger i = BigConstants::TWO; i <= n; ++i) {
+    for (BigInteger i = BigConstants::TWO; i <= N; ++i) {
         f *= i;
     }
     return f;
