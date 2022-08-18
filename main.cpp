@@ -26,30 +26,37 @@ int main()
 
     t.unpause();
 
+    fib:
     {
         Timer fibonacci_timer(std::cout, "main::local_scope_fibonacci");
         fib_n = BigInteger::fibonacci(n);
     }
 
+    fact:
     {
         Timer factorial_timer(std::cout, "main::local_scope_factorial");
         fact_n = BigInteger::factorial(n);
     }
 
+    cat:
     {
         Timer catalan_timer(std::cout, "main::local_scope_catalan");
         cat_n  = BigInteger::catalan(n);
     }
 
+    exp:
     {
         Timer exponent_timer(std::cout, "main::local_scope_exponentiation");
         u1 = fib_n ^ 17;
     }
 
+    mod:
     {
         Timer modulo_timer(std::cout, "main::local_scope_modulo");
         u2 = fact_n % cat_n;
     }
+
+    end:
 
     std::cout << "\nVAL: fibonacci(" << n << ") = " << fib_n << '\n'
               << "\nVAL: " << n << "! = " << fact_n << '\n'
