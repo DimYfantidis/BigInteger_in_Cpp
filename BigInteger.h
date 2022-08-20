@@ -46,7 +46,7 @@ public:
 
     friend int Length(const BigInteger &);
 
-    const void *address() { return reinterpret_cast<void *>(digits.data()); }
+    const void *address() const { return reinterpret_cast<const void *>(digits.data()); }
 
     friend void swap(BigInteger &a, BigInteger &b);
 

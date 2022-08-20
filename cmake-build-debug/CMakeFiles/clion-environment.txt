@@ -1,4 +1,4 @@
 ToolSet: w64 6.0 (local)@C:\Program Files (x86)\MinGW\x86_64-w64-mingw32
 Options: 
 
-Options:-DCMAKE_MAKE_PROGRAM=C:/Users/axaio/AppData/Local/JetBrains/Toolbox/apps/CLion/ch-0/222.3345.126/bin/ninja/win/ninja.exe
+Options:-DCMAKE_MAKE_PROGRAM=C:/Users/axaio/AppData/Local/JetBrains/Toolbox/apps/CLion/ch-0/222.3739.54/bin/ninja/win/ninja.exe

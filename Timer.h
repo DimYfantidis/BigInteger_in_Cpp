@@ -73,6 +73,4 @@ public:
     }
 };
 
-
-
 #endif //BIGINTEGER_TIMER_H

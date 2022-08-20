@@ -139,7 +139,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "C:/Users/axaio/AppData/Local/JetBrains/Toolbox/apps/CLion/ch-0/222.3345.126/bin/cmake/win/bin/cmake.exe"
+			"value" : "C:/Users/axaio/AppData/Local/JetBrains/Toolbox/apps/CLion/ch-0/222.3739.54/bin/cmake/win/bin/cmake.exe"
 		},
 		{
 			"name" : "CMAKE_CPACK_COMMAND",
@@ -151,7 +151,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "C:/Users/axaio/AppData/Local/JetBrains/Toolbox/apps/CLion/ch-0/222.3345.126/bin/cmake/win/bin/cpack.exe"
+			"value" : "C:/Users/axaio/AppData/Local/JetBrains/Toolbox/apps/CLion/ch-0/222.3739.54/bin/cmake/win/bin/cpack.exe"
 		},
 		{
 			"name" : "CMAKE_CTEST_COMMAND",
@@ -163,7 +163,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "C:/Users/axaio/AppData/Local/JetBrains/Toolbox/apps/CLion/ch-0/222.3345.126/bin/cmake/win/bin/ctest.exe"
+			"value" : "C:/Users/axaio/AppData/Local/JetBrains/Toolbox/apps/CLion/ch-0/222.3739.54/bin/cmake/win/bin/ctest.exe"
 		},
 		{
 			"name" : "CMAKE_CXX_COMPILER",
@@ -699,7 +699,7 @@
 				}
 			],
 			"type" : "UNINITIALIZED",
-			"value" : "C:/Users/axaio/AppData/Local/JetBrains/Toolbox/apps/CLion/ch-0/222.3345.126/bin/ninja/win/ninja.exe"
+			"value" : "C:/Users/axaio/AppData/Local/JetBrains/Toolbox/apps/CLion/ch-0/222.3739.54/bin/ninja/win/ninja.exe"
 		},
 		{
 			"name" : "CMAKE_MODULE_LINKER_FLAGS",
@@ -1039,7 +1039,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "C:/Users/axaio/AppData/Local/JetBrains/Toolbox/apps/CLion/ch-0/222.3345.126/bin/cmake/win/share/cmake-3.23"
+			"value" : "C:/Users/axaio/AppData/Local/JetBrains/Toolbox/apps/CLion/ch-0/222.3739.54/bin/cmake/win/share/cmake-3.23"
 		},
 		{
 			"name" : "CMAKE_SHARED_LINKER_FLAGS",
